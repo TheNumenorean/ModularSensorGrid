@@ -1,6 +1,7 @@
 package net.thenumenorean.modularsensorgrid;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import net.thenumenorean.modularsensorgrid.sensor.Sensor;
 
@@ -12,8 +13,8 @@ public class ModularSensorGrid {
 		sensors = new ArrayList<Sensor>();
 	}
 	
-	public void scan(){
-		
+	public void addAll(List<Sensor> sensors){
+		this.sensors.addAll(sensors);
 	}
 	
 	public void addSensor(Sensor s){
