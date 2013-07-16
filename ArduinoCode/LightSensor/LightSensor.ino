@@ -60,6 +60,8 @@ void loop() {
       
       if(!client.connected())
         break;
+        
+      com.trim();
       
       Serial.println("Command: " + com);
       
