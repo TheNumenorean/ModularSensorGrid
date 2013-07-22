@@ -11,6 +11,10 @@ byte mac[] = {
 IPAddress ip(192,168,1,177);
 
 EthernetServer server(80);
+int numClients = 0;
+const int possibleConnections = 4;
+EthernetClient clients[possibleConnections];
+String clientCommands[possibleConnections];
 
 void setup() {
   
@@ -39,52 +43,102 @@ void setup() {
 
 
 void loop() {
-  // listen for incoming clients
-  EthernetClient client = server.available();
-  if (client) {
-    Serial.println("New client");
+  
+  EthernetClient tmp = server.available();
+  
+  if(tmp){
     digitalWrite(STATUS, HIGH);
+    if(numClients == possibleConnections){
+      Serial.println("Had to discard new client!");
+      tmp.println("Sorry, too many concurrent connections!");
+      tmp.stop();
+    } else {
+      Serial.println("New client");
+      clients[numClients] = tmp;
+      clientCommands[numClients] = "";
+      numClients++;
+      tmp.println("Arduino LightSensor v1.0");
+    }
+  }
+  
+  for(int y = 0; y < numClients; y++){
+    EthernetClient client = clients[y];
     
-    while (client.connected()) {
+    if(client.connected()){
       
-      String com = "";
-      while(client.connected()){
-        if(client.available()) {
-          char c = client.read();
-          if(c == '\n')
-            break;
-          com = com + c;
-        }
+      while(client.connected() && client.available()){
+        char c = client.read();
+        if(c == '\n'){
+          interpretCommand(clientCommands[y], client);
+          clientCommands[y] = "";
+        } else
+          clientCommands[y] = clientCommands[y] + c;
       
       }
       
-      if(!client.connected())
-        break;
-        
+      
+    } else {
+      
+      Serial.println("Client disonnected");
+      digitalWrite(STATUS, LOW);
+      
+      numClients--;
+      for(int x = y; x < numClients; x++){
+        clients[x] = clients[x + 1];
+      }
+      
+      y--;
+    }
+  }
+  
+}
+
+void interpretCommand(String com, EthernetClient client){
       com.trim();
       
       Serial.println("Command: " + com);
+      Serial.flush();
+      String args[10];
+      int cnt = split(com, ' ', args);
       
-      if (com == "data") {
+      if (args[0] == "data") {
         int sensorReading = analogRead(0);
         client.println(sensorReading);
-        com = "";
-      } else if(com == "light"){
-        digitalWrite(EXTRA, !digitalRead(EXTRA));
-      } else if(com == "exit"){
+      } else if(args[0] == "light"){
+        
+        if(args[1] == "on"){
+          digitalWrite(EXTRA, HIGH);
+          Serial.println("Turning light on");
+        } else if(args[1] == "off"){
+          digitalWrite(EXTRA, LOW);
+          Serial.println("Turning light off");
+        } else if(args[1] == "") {
+          digitalWrite(EXTRA, !digitalRead(EXTRA));
+          Serial.println("Toggling light");
+        } else {
+          client.println("Unknown parameter " + args[1]);
+        }
+        
+      } else if(args[0] == "exit"){
         client.println("Live long and prosper!");
         client.stop();
       } else {
         client.println("Unknown command " + com);
       }
-      
-      delay(1);
-      
-    }
-    
-    Serial.println("Client disonnected");
-    digitalWrite(STATUS, LOW);
-    
+}
+
+int split(String s, char c, String strs[]){
+  
+  int index, cnt = 0;
+  while((index = s.indexOf(c)) != -1){
+    strs[cnt] = s.substring(0, index);
+    s = s.substring(index + 1, s.length());
+    cnt++;
   }
+  
+  strs[cnt] = s;
+  cnt++;
+  
+  return cnt;
   
 }
