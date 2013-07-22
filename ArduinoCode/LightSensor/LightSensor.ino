@@ -34,15 +34,15 @@ void setup() {
     ; 
   }
   
-  /*
+  
   Serial.println("Trying to get an IP address using DHCP");
   if (Ethernet.begin(mac) == 0) {
     Serial.println("Failed to configure Ethernet using DHCP");
     
     Ethernet.begin(mac, ip);
-  }*/
+  }
   
-  Ethernet.begin(mac, ip);
+  //Ethernet.begin(mac, ip);
   
   server.begin();
   Serial.print("server is at ");
@@ -126,8 +126,6 @@ void loop() {
     tmp.concat(" ");
     tmp.concat(serverPort);
     tmp.concat(" "); //Cuts off last char
-    
-    Serial.println(tmp);
     
     char chars[tmp.length()];
     tmp.toCharArray(chars, tmp.length());
