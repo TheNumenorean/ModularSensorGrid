@@ -19,11 +19,7 @@ public class Tester {
 		
 		try {
 			msg.addSensor(new LightSensor("light", "192.168.1.177", 80));
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -33,10 +29,10 @@ public class Tester {
 		
 		while (true){
 			l.toggleLight();
+			System.out.println(l.getCurrent());
 			try {
 				Thread.sleep(500);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
