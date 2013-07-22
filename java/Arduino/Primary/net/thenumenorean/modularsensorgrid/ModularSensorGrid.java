@@ -21,7 +21,7 @@ public class ModularSensorGrid {
 	
 	public void addSensor(Sensor add){
 		for(Sensor s : sensors)
-			if(s.equals(add))
+			if(s.getName().equals(add.getName()))
 				return;
 		sensors.add(add);
 	}
