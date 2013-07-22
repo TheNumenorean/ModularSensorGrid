@@ -18,6 +18,10 @@ public class LightSensor extends Arduino {
 	public void toggleLight(){
 		sendCommand("light");
 	}
+	
+	public void setLight(boolean on){
+		sendCommand("light " + (on ? "on" : "off"));
+	}
 
 	@Override
 	public boolean isAvailible() {

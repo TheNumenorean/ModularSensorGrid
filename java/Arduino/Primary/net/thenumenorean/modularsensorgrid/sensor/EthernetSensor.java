@@ -9,30 +9,49 @@ public abstract class EthernetSensor implements Sensor {
 	private Socket sock;
 	private String ip;
 	private int port;
-	
-	public EthernetSensor(String ip, int port) throws UnknownHostException, IOException {
+	protected final String hello;
+
+	public EthernetSensor(String ip, int port) throws UnknownHostException,
+			IOException {
 		this.ip = ip;
 		this.port = port;
-		reconnect();
+		hello = reconnect();
+
 	}
-	
-	public boolean isConnected(){
+
+	public boolean isConnected() {
 		return sock.isConnected() && !sock.isClosed();
 	}
-	
-	public void reconnect() throws UnknownHostException, IOException{
+
+	public String reconnect() throws UnknownHostException, IOException {
+		System.out.println("Connecting");
 		sock = new Socket(ip, port);
+
+		while (sock.getInputStream().available() == 0) {
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+
+		String tmp = "";
+
+		while (sock.getInputStream().available() > 0)
+			tmp = tmp + (char) sock.getInputStream().read();
+
+		return tmp;
 	}
-	
-	protected Socket getSocket(){
+
+	protected Socket getSocket() {
 		return sock;
 	}
-	
-	public String getIP(){
+
+	public String getIP() {
 		return ip;
 	}
-	
-	public int getPort(){
+
+	public int getPort() {
 		return port;
 	}
 

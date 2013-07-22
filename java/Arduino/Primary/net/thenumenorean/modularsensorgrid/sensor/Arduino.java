@@ -15,6 +15,10 @@ public abstract class Arduino extends EthernetSensor {
 			throws UnknownHostException, IOException {
 		super(ip, port);
 		setName(name);
+		
+		System.out.println(hello);
+		System.out.flush();
+		
 	}
 
 	protected String sendCommand(String s) {
@@ -32,7 +36,7 @@ public abstract class Arduino extends EthernetSensor {
 			out.write(s);
 			out.flush();
 
-			Thread.sleep(1000);
+			Thread.sleep(100);
 
 			InputStream is = sock.getInputStream();
 			String resp = "";
