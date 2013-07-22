@@ -43,13 +43,13 @@ void setup() {
 
 
 void loop() {
-  //Doesn't listen for new Clients ERROR
+  
   EthernetClient tmp = server.available();
   
   if(tmp){
     digitalWrite(STATUS, HIGH);
     if(numClients == possibleConnections){
-      Serial.println("Couldn't connect new client!");
+      Serial.println("Had to discard new client!");
       tmp.println("Sorry, too many concurrent connections!");
       tmp.stop();
     } else {
@@ -57,7 +57,7 @@ void loop() {
       clients[numClients] = tmp;
       clientCommands[numClients] = "";
       numClients++;
-      
+      tmp.println("Arduino LightSensor v1.0");
     }
   }
   
@@ -97,7 +97,7 @@ void interpretCommand(String com, EthernetClient client){
       com.trim();
       
       Serial.println("Command: " + com);
-      
+      Serial.flush();
       String args[10];
       int cnt = split(com, ' ', args);
       
@@ -105,7 +105,20 @@ void interpretCommand(String com, EthernetClient client){
         int sensorReading = analogRead(0);
         client.println(sensorReading);
       } else if(args[0] == "light"){
-        digitalWrite(EXTRA, !digitalRead(EXTRA));
+        
+        if(args[1] == "on"){
+          digitalWrite(EXTRA, HIGH);
+          Serial.println("Turning light on");
+        } else if(args[1] == "off"){
+          digitalWrite(EXTRA, LOW);
+          Serial.println("Turning light off");
+        } else if(args[1] == "") {
+          digitalWrite(EXTRA, !digitalRead(EXTRA));
+          Serial.println("Toggling light");
+        } else {
+          client.println("Unknown parameter " + args[1]);
+        }
+        
       } else if(args[0] == "exit"){
         client.println("Live long and prosper!");
         client.stop();
@@ -119,16 +132,12 @@ int split(String s, char c, String strs[]){
   int index, cnt = 0;
   while((index = s.indexOf(c)) != -1){
     strs[cnt] = s.substring(0, index);
-    s = s.substring(index, s.length());
+    s = s.substring(index + 1, s.length());
     cnt++;
   }
   
   strs[cnt] = s;
   cnt++;
-  
-  for (int y = 0; y < cnt; y++){
-    Serial.println(strs[y]);
-  }
   
   return cnt;
   
