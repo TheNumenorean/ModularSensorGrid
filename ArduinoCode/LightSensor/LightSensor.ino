@@ -58,6 +58,7 @@ void loop() {
       clientCommands[numClients] = "";
       numClients++;
       tmp.println("Arduino LightSensor v1.0");
+      tmp.flush();
     }
   }
   
@@ -80,12 +81,17 @@ void loop() {
     } else {
       
       Serial.println("Client disonnected");
-      digitalWrite(STATUS, LOW);
+      client.stop();
       
+      Serial.println("Correcting");
       numClients--;
       for(int x = y; x < numClients; x++){
+        Serial.println(x);
         clients[x] = clients[x + 1];
       }
+      
+      if(numClients == 0)
+        digitalWrite(STATUS, LOW);
       
       y--;
     }
@@ -125,6 +131,8 @@ void interpretCommand(String com, EthernetClient client){
       } else {
         client.println("Unknown command " + com);
       }
+      
+      client.flush();
 }
 
 int split(String s, char c, String strs[]){
