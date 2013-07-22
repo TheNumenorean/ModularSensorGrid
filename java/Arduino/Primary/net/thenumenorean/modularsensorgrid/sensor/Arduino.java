@@ -10,18 +10,21 @@ import java.net.UnknownHostException;
 public abstract class Arduino extends EthernetSensor {
 
 	private String name;
+	private double version;
 
-	public Arduino(String name, String ip, int port)
+	public Arduino(String name, double version, String ip, int port)
 			throws UnknownHostException, IOException {
 		super(ip, port);
 		setName(name);
-		
-		System.out.println(hello);
-		System.out.flush();
+		this.version = version;
 		
 	}
+	
+	protected String sendCommand(String s){
+		return sendCommand(s, false);
+	}
 
-	protected String sendCommand(String s) {
+	protected String sendCommand(String s, boolean wait) {
 		
 		s = s + "\n";
 
@@ -37,8 +40,13 @@ public abstract class Arduino extends EthernetSensor {
 			out.flush();
 
 			Thread.sleep(100);
-
 			InputStream is = sock.getInputStream();
+			
+			if(wait)
+				while(is.available() == 0)
+					Thread.sleep(50);
+
+			
 			String resp = "";
 			while (is.available() > 0)
 				resp = resp + (char)is.read();
@@ -63,6 +71,13 @@ public abstract class Arduino extends EthernetSensor {
 	@Override
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	/**
+	 * @return the version
+	 */
+	public double getVersion() {
+		return version;
 	}
 
 }

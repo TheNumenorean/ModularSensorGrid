@@ -14,11 +14,16 @@ public class ModularSensorGrid {
 	}
 	
 	public void addAll(List<Sensor> sensors){
-		this.sensors.addAll(sensors);
+		
+		for(Sensor s : sensors)
+			addSensor(s);
 	}
 	
-	public void addSensor(Sensor s){
-		sensors.add(s);
+	public void addSensor(Sensor add){
+		for(Sensor s : sensors)
+			if(s.equals(add))
+				return;
+		sensors.add(add);
 	}
 	
 	public Sensor getSensor(String name){

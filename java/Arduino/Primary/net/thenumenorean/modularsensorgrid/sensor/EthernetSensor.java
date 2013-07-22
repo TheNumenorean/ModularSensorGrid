@@ -24,7 +24,7 @@ public abstract class EthernetSensor implements Sensor {
 	}
 
 	public String reconnect() throws UnknownHostException, IOException {
-		System.out.println("Connecting");
+		
 		sock = new Socket(ip, port);
 
 		while (sock.getInputStream().available() == 0) {

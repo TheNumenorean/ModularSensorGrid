@@ -5,14 +5,14 @@ import java.net.UnknownHostException;
 
 public class LightSensor extends Arduino {
 
-	public LightSensor(String name, String ip, int port)
+	public LightSensor(String name, double version, String ip, int port)
 			throws UnknownHostException, IOException {
-		super(name, ip, port);
+		super(name, version, ip, port);
 		
 	}
 	
-	public double getCurrent(){
-		return Double.parseDouble(sendCommand("data").trim());
+	public double getValue(){
+		return Double.parseDouble(sendCommand("data", true).trim());
 	}
 	
 	public void toggleLight(){

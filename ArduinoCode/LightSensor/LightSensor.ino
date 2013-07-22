@@ -1,8 +1,11 @@
 #include <SPI.h>
 #include <Ethernet.h>
+#include <EthernetUdp.h>
 
 #define STATUS 7
 #define EXTRA 6
+#define BUTTON 2
+#define BROAD_PORT 22001
 
 // Enter a MAC address and IP address for your controller below.
 // The IP address will be dependent on your local network:
@@ -10,11 +13,19 @@ byte mac[] = {
   0x90, 0xA2, 0xDA, 0x0D, 0x54, 0x0B };
 IPAddress ip(192,168,1,177);
 
-EthernetServer server(80);
+EthernetUDP Udp;
+
+String name = "LightSensor1";
+String vers = "1.0";
+int serverPort = 22000;
+
+EthernetServer server(serverPort);
 int numClients = 0;
 const int possibleConnections = 4;
 EthernetClient clients[possibleConnections];
 String clientCommands[possibleConnections];
+
+boolean last_press = false;
 
 void setup() {
   
@@ -37,8 +48,11 @@ void setup() {
   Serial.print("server is at ");
   Serial.println(Ethernet.localIP());
   
+  Udp.begin(BROAD_PORT);
+  
   pinMode(STATUS, OUTPUT);
   pinMode(EXTRA, OUTPUT);
+  pinMode(BUTTON, INPUT);
 }
 
 
@@ -57,7 +71,7 @@ void loop() {
       clients[numClients] = tmp;
       clientCommands[numClients] = "";
       numClients++;
-      tmp.println("Arduino LightSensor v1.0");
+      tmp.println("Arduino LightSensor v" + vers);
       tmp.flush();
     }
   }
@@ -83,10 +97,8 @@ void loop() {
       Serial.println("Client disonnected");
       client.stop();
       
-      Serial.println("Correcting");
       numClients--;
       for(int x = y; x < numClients; x++){
-        Serial.println(x);
         clients[x] = clients[x + 1];
       }
       
@@ -97,8 +109,40 @@ void loop() {
     }
   }
   
+  if(digitalRead(BUTTON) != last_press && digitalRead(BUTTON)){
+    Udp.beginPacket("255.255.255.255", BROAD_PORT);
+    
+    String tmp = "Arduino LightSensor " + vers + " " + name + " ";
+    
+    boolean start = true;
+    for (byte thisByte = 0; thisByte < 4; thisByte++) {
+      if(start)
+        start = false;
+      else
+        tmp.concat("."); 
+      tmp.concat(Ethernet.localIP()[thisByte]);
+    }
+    
+    tmp.concat(" ");
+    tmp.concat(serverPort);
+    tmp.concat(" "); //Cuts off last char
+    
+    Serial.println(tmp);
+    
+    char chars[tmp.length()];
+    tmp.toCharArray(chars, tmp.length());
+    Udp.write(chars);
+    
+    Udp.endPacket();
+  }
+  
+  last_press = digitalRead(BUTTON);
+  
+  delay(10);
+  
 }
 
+//Command Interpreter
 void interpretCommand(String com, EthernetClient client){
       com.trim();
       
