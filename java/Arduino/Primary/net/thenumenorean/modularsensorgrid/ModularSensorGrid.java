@@ -27,5 +27,16 @@ public class ModularSensorGrid {
 				return s;
 		return null;
 	}
+	
+	public boolean removeSensor(Sensor s){
+		return sensors.remove(s);
+	}
+	
+	public boolean removeSensor(String name){
+		for(Sensor s : sensors)
+			if(s.getName().equals(name))
+				return sensors.remove(s);
+		return false;
+	}
 
 }
