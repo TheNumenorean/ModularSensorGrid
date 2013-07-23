@@ -30,7 +30,7 @@ public abstract class Arduino extends EthernetSensor {
 
 		try {
 			if (!isConnected())
-				reconnect();
+				return null;
 
 			Socket sock = this.getSocket();
 			PrintWriter out = new PrintWriter(new BufferedOutputStream(
@@ -39,15 +39,17 @@ public abstract class Arduino extends EthernetSensor {
 			out.write(s);
 			out.flush();
 
-			Thread.sleep(100);
+			if(!wait)
+				Thread.sleep(100);
 			InputStream is = sock.getInputStream();
 			
 			if(wait)
 				while(is.available() == 0)
-					Thread.sleep(50);
+					Thread.sleep(10);
 
 			
 			String resp = "";
+			//TODO: Make it wait only a certain amount of time.
 			while (is.available() > 0)
 				resp = resp + (char)is.read();
 
@@ -78,6 +80,11 @@ public abstract class Arduino extends EthernetSensor {
 	 */
 	public double getVersion() {
 		return version;
+	}
+	
+	@Override
+	public void destroy(){
+		sendCommand("exit");
 	}
 
 }

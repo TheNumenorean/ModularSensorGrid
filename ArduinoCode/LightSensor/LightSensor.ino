@@ -6,6 +6,7 @@
 #define EXTRA 6
 #define BUTTON 2
 #define BROAD_PORT 22001
+#define SERV_PORT 22000
 
 // Enter a MAC address and IP address for your controller below.
 // The IP address will be dependent on your local network:
@@ -17,11 +18,10 @@ EthernetUDP Udp;
 
 String name = "LightSensor1";
 String vers = "1.0";
-int serverPort = 22000;
 
-EthernetServer server(serverPort);
+EthernetServer server(SERV_PORT);
 int numClients = 0;
-const int possibleConnections = 4;
+const int possibleConnections = 1;
 EthernetClient clients[possibleConnections];
 String clientCommands[possibleConnections];
 
@@ -124,7 +124,7 @@ void loop() {
     }
     
     tmp.concat(" ");
-    tmp.concat(serverPort);
+    tmp.concat(SERV_PORT);
     tmp.concat(" "); //Cuts off last char
     
     char chars[tmp.length()];

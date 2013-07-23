@@ -12,7 +12,9 @@ public class LightSensor extends Arduino {
 	}
 	
 	public double getValue(){
-		return Double.parseDouble(sendCommand("data", true).trim());
+		if(this.isConnected())
+			return Double.parseDouble(sendCommand("data", true).trim());
+		return -1;
 	}
 	
 	public void toggleLight(){

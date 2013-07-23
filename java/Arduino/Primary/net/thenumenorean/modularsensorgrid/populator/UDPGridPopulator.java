@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 
 import net.thenumenorean.modularsensorgrid.ModularSensorGrid;
 import net.thenumenorean.modularsensorgrid.sensor.LightSensor;
@@ -54,17 +55,29 @@ public class UDPGridPopulator extends GridPopulator {
 			this.msg = msg;
 			this.port = port;
 			stop = false;
+			try {
+				dsocket = new DatagramSocket(port);
+				dsocket.setSoTimeout(0);
+			} catch (SocketException e) {
+				e.printStackTrace();
+			}
+	        
 		}
 		
 		@Override
 		public void run(){
 			try {
-	            dsocket = new DatagramSocket(port);
+	            
 	            byte[] buffer = new byte[2048];
 	 
 	            DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
 	            while (!stop) {
-	                dsocket.receive(packet);
+	                try{
+	                	dsocket.receive(packet);
+	                } catch (SocketTimeoutException e){
+	                	System.out.println(e.getMessage());
+	                	continue;
+	                }
 	                String message = new String(buffer, 0, packet.getLength());
 	                System.out.println(packet.getAddress().getHostName() + ": " + message);
 	                packet.setLength(buffer.length);
@@ -90,6 +103,7 @@ public class UDPGridPopulator extends GridPopulator {
 
 		public void halt() {
 			stop = true;
+			System.out.println("Killing");
 			dsocket.close();
 		}
 

@@ -28,5 +28,11 @@ public interface Sensor {
 	 * 
 	 */
 	public void setName(String name);
+	
+	/**
+	 * Should be called when a sensor is no longer needed, this method should
+	 * release all resources in use.
+	 */
+	public void destroy();
 
 }

@@ -54,5 +54,27 @@ public abstract class EthernetSensor implements Sensor {
 	public int getPort() {
 		return port;
 	}
+	
+	public void close(){
+		try {
+			sock.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Override
+	public void destroy(){
+		try {
+			sock.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Override
+	public String toString(){
+		return this.getClass().getName() + " " + getName();
+	}
 
 }

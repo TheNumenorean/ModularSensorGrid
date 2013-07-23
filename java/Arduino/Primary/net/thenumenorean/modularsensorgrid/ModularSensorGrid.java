@@ -43,5 +43,14 @@ public class ModularSensorGrid {
 				return sensors.remove(s);
 		return false;
 	}
+	
+	public ArrayList<Sensor> getAllSensors(){
+		return sensors;
+	}
+	
+	public void destroy(){
+		for(Sensor s : sensors)
+			s.destroy();
+	}
 
 }
