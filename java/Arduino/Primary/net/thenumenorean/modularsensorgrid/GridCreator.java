@@ -6,8 +6,8 @@ public class GridCreator {
 	
 	private static final int BROADCAST_PORT = 22001;
 	
-	public static ModularSensorGrid constructNewModularSensorGrid(int scan_time){
-		ModularSensorGrid grid = new ModularSensorGrid();
+	public static ModularSensorGrid constructNewNetworkGrid(int scan_time){
+		NetworkedModularSensorGrid grid = new NetworkedModularSensorGrid();
 
 		UDPGridPopulator pop = new UDPGridPopulator(grid, BROADCAST_PORT);
 		pop.start();

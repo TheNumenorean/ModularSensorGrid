@@ -10,6 +10,7 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 
 import net.thenumenorean.modularsensorgrid.ModularSensorGrid;
+import net.thenumenorean.modularsensorgrid.sensor.EthernetSensor;
 import net.thenumenorean.modularsensorgrid.sensor.LightSensor;
 import net.thenumenorean.modularsensorgrid.sensor.Sensor;
 
@@ -47,13 +48,11 @@ public class UDPGridPopulator extends GridPopulator {
 	private class Populator extends Thread {
 
 		private ModularSensorGrid msg;
-		private int port;
 		private boolean stop;
 		private DatagramSocket dsocket;
 
 		public Populator(ModularSensorGrid msg, int port) {
 			this.msg = msg;
-			this.port = port;
 			stop = false;
 			try {
 				dsocket = new DatagramSocket(port);
@@ -82,7 +81,7 @@ public class UDPGridPopulator extends GridPopulator {
 	                System.out.println(packet.getAddress().getHostName() + ": " + message);
 	                packet.setLength(buffer.length);
 	                
-	                Sensor s = construct(message);
+	                EthernetSensor s = construct(message);
 	                
 	                if(s != null){
 	                	msg.addSensor(s);
@@ -109,9 +108,9 @@ public class UDPGridPopulator extends GridPopulator {
 
 	}
 	
-	public Sensor construct(String s){
+	public EthernetSensor construct(String s){
 		
-		Sensor sensor = null;
+		EthernetSensor sensor = null;
 		
 		String[] args = s.split(" ");
 		
