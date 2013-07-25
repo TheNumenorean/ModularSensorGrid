@@ -45,7 +45,7 @@ void setup() {
   //Ethernet.begin(mac, ip);
   
   server.begin();
-  Serial.print("server is at ");
+  Serial.print("Server is at ");
   Serial.println(Ethernet.localIP());
   
   Udp.begin(BROAD_PORT);

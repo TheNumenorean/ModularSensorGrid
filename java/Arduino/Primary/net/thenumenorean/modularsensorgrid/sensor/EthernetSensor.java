@@ -23,6 +23,11 @@ public abstract class EthernetSensor implements Sensor {
 		return sock.isConnected() && !sock.isClosed();
 	}
 
+	@Override
+	public boolean isAvailible() {
+		return isConnected();
+	}
+
 	public String reconnect() throws UnknownHostException, IOException {
 		
 		sock = new Socket(ip, port);

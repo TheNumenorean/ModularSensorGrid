@@ -25,10 +25,4 @@ public class LightSensor extends Arduino {
 		sendCommand("light " + (on ? "on" : "off"));
 	}
 
-	@Override
-	public boolean isAvailible() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
 }
