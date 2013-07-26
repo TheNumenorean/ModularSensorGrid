@@ -26,6 +26,7 @@ EthernetClient clients[possibleConnections];
 String clientCommands[possibleConnections];
 
 boolean last_press = false;
+long millOld;
 
 void setup() {
   
@@ -57,6 +58,8 @@ void setup() {
 
 
 void loop() {
+  
+  millOld = millis();
   
   EthernetClient tmp = server.available();
   
@@ -136,45 +139,44 @@ void loop() {
   
   last_press = digitalRead(BUTTON);
   
+  
   delay(10);
   
 }
 
 //Command Interpreter
 void interpretCommand(String com, EthernetClient client){
-      com.trim();
-      
-      Serial.println("Command: " + com);
-      Serial.flush();
-      String args[10];
-      int cnt = split(com, ' ', args);
-      
-      if (args[0] == "data") {
-        int sensorReading = analogRead(0);
-        client.println(sensorReading);
-      } else if(args[0] == "light"){
-        
-        if(args[1] == "on"){
-          digitalWrite(EXTRA, HIGH);
-          Serial.println("Turning light on");
-        } else if(args[1] == "off"){
-          digitalWrite(EXTRA, LOW);
-          Serial.println("Turning light off");
-        } else if(args[1] == "") {
-          digitalWrite(EXTRA, !digitalRead(EXTRA));
-          Serial.println("Toggling light");
-        } else {
-          client.println("Unknown parameter " + args[1]);
-        }
-        
-      } else if(args[0] == "exit"){
-        client.println("Live long and prosper!");
-        client.stop();
-      } else {
-        client.println("Unknown command " + com);
-      }
-      
-      client.flush();
+  
+  com.trim();
+  
+  Serial.println("Command: " + com);
+  String args[10];
+  int cnt = split(com, ' ', args);
+  
+  if (args[0] == "data") {
+    int sensorReading = analogRead(0);
+    client.println(sensorReading);
+  } else if(args[0] == "light"){
+    
+    if(args[1] == "on"){
+      digitalWrite(EXTRA, HIGH);
+      Serial.println("Turning light on");
+    } else if(args[1] == "off"){
+      digitalWrite(EXTRA, LOW);
+      Serial.println("Turning light off");
+    } else if(args[1] == "") {
+      digitalWrite(EXTRA, !digitalRead(EXTRA));
+      Serial.println("Toggling light");
+    } else {
+      client.println("Unknown parameter " + args[1]);
+    }
+    
+  } else if(args[0] == "exit"){
+    client.println("Live long and prosper!");
+    client.stop();
+  } else {
+    client.println("Unknown command " + com);
+  }
 }
 
 int split(String s, char c, String strs[]){
