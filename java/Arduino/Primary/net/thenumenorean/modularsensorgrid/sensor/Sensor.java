@@ -3,6 +3,9 @@
  */
 package net.thenumenorean.modularsensorgrid.sensor;
 
+import java.util.ArrayList;
+
+import net.thenumenorean.modularsensorgrid.EthernetSensorGridException;
 import net.thenumenorean.modularsensorgrid.datacapture.DataCaptureTool;
 
 /**
@@ -27,6 +30,19 @@ public interface Sensor {
 	 * @param tool The tool to add
 	 */
 	public void addDataCaptureTool(DataCaptureTool tool);
+	
+	/**
+	 * Removes the given DataCaptureTool from this Sensor.
+	 * @param d DataCaptureTool to remove.
+	 * @return True if successfull, false otherwise
+	 */
+	public boolean removeDataCaptureTool(DataCaptureTool d);
+	
+	/**
+	 * Gets all the DataCaptureTools that are connected to this sensor.
+	 * @return A potentially empty ArrayList.
+	 */
+	public ArrayList<DataCaptureTool> getDataCaptureTools();
 
 	/**
 	 * Tests whether the sensor is available for data retrieval.
@@ -53,5 +69,11 @@ public interface Sensor {
 	 * release all resources in use.
 	 */
 	public void destroy();
-
+	
+	/**
+	 * Gets the type of this sensor
+	 * @return A String that represents the type.
+	 */
+	public String getType();
+	
 }

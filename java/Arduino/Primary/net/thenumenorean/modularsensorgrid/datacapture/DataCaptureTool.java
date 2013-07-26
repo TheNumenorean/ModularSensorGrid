@@ -3,16 +3,18 @@
  */
 package net.thenumenorean.modularsensorgrid.datacapture;
 
+import net.thenumenorean.modularsensorgrid.sensor.Sensor;
+
 /**
  * @author The Numenorean
  *
  */
 public interface DataCaptureTool {
 	
-	public void addData(long time, String sensorName, Object value);
-	public void addData(long time, String sensorName, int value);
-	public void addData(long time, String sensorName, boolean value);
-	public void addData(long time, String sensorName, long value);
-	public void addData(long time, String sensorName, double value);
+	public void addData(Sensor s, String dataName, long time, Object value);
+	public void addData(Sensor s, String dataName, long time, int value);
+	public void addData(Sensor s, String dataName, long time, boolean value);
+	public void addData(Sensor s, String dataName, long time, long value);
+	public void addData(Sensor s, String dataName, long time, double value);
 	
 }

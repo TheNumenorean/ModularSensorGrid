@@ -3,6 +3,9 @@ package net.thenumenorean.modularsensorgrid.sensor;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+
+import net.thenumenorean.modularsensorgrid.datacapture.DataCaptureTool;
 
 public abstract class EthernetSensor implements Sensor {
 
@@ -10,6 +13,7 @@ public abstract class EthernetSensor implements Sensor {
 	private String ip;
 	private int port;
 	protected final String hello;
+	private ArrayList<DataCaptureTool> captureTools;
 
 	public EthernetSensor(String ip, int port) throws UnknownHostException,
 			IOException {
@@ -80,6 +84,21 @@ public abstract class EthernetSensor implements Sensor {
 	@Override
 	public String toString(){
 		return this.getClass().getName() + " " + getName();
+	}
+	
+	@Override
+	public void addDataCaptureTool(DataCaptureTool d){
+		captureTools.add(d);
+	}
+	
+	@Override
+	public boolean removeDataCaptureTool(DataCaptureTool d){
+		return captureTools.remove(d);
+	}
+	
+	@Override
+	public ArrayList<DataCaptureTool> getDataCaptureTools(){
+		return captureTools;
 	}
 
 }
