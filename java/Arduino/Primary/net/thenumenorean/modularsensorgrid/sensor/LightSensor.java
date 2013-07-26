@@ -3,8 +3,6 @@ package net.thenumenorean.modularsensorgrid.sensor;
 import java.io.IOException;
 import java.net.UnknownHostException;
 
-import net.thenumenorean.modularsensorgrid.datacapture.DataCaptureTool;
-
 public class LightSensor extends Arduino {
 
 	public LightSensor(String name, double version, String ip, int port)
@@ -29,13 +27,21 @@ public class LightSensor extends Arduino {
 
 	@Override
 	public void start() {
-		// TODO Auto-generated method stub
+		
+		
 		
 	}
 
 	@Override
 	public void stop() {
 		// TODO Auto-generated method stub
+		
+	}
+	
+	private class SensorRunner extends Thread{
+		
+		
+		
 		
 	}
 
