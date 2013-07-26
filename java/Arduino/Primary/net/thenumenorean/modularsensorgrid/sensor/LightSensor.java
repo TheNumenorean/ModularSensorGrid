@@ -39,16 +39,4 @@ public class LightSensor extends Arduino {
 		
 	}
 
-	@Override
-	public void addDataCaptureTool(DataCaptureTool tool) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public String getType() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }

@@ -100,5 +100,10 @@ public abstract class EthernetSensor implements Sensor {
 	public ArrayList<DataCaptureTool> getDataCaptureTools(){
 		return captureTools;
 	}
+	
+	@Override
+	public String getType(){
+		return this.getClass().getName();
+	}
 
 }
