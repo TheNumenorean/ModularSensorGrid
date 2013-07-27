@@ -2,7 +2,6 @@ import java.io.IOException;
 
 import net.thenumenorean.modularsensorgrid.GridCreator;
 import net.thenumenorean.modularsensorgrid.ModularSensorGrid;
-import net.thenumenorean.modularsensorgrid.populator.UDPGridPopulator;
 import net.thenumenorean.modularsensorgrid.sensor.LightSensor;
 
 public class Tester {
