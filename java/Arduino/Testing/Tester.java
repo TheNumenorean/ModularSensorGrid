@@ -8,7 +8,7 @@ public class Tester {
 
 	public static void main(String[] args) throws InterruptedException, IOException {
 		
-		ModularSensorGrid msg = GridCreator.constructNewNetworkGrid(10);
+		ModularSensorGrid msg = GridCreator.constructNewNetworkGrid(10000, 1);
 		
 		LightSensor l = (LightSensor) msg.getSensor("LightSensor1");
 

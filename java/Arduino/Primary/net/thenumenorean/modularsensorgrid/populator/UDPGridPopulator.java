@@ -33,8 +33,13 @@ public class UDPGridPopulator extends GridPopulator {
 	 */
 	@Override
 	public void start() {
+		start(0);
+	}
+	
+	@Override
+	public void start(int sensorAmt) {
 		
-		p = new Populator(getMSG(), port);
+		p = new Populator(getMSG(), port, sensorAmt);
 		p.start();
 
 	}
@@ -50,8 +55,9 @@ public class UDPGridPopulator extends GridPopulator {
 		private ModularSensorGrid msg;
 		private boolean stop;
 		private DatagramSocket dsocket;
-
-		public Populator(ModularSensorGrid msg, int port) {
+		private int sensorAmt, found;
+		
+		public Populator(ModularSensorGrid msg, int port, int sensorAmt) {
 			this.msg = msg;
 			stop = false;
 			try {
@@ -60,9 +66,11 @@ public class UDPGridPopulator extends GridPopulator {
 			} catch (SocketException e) {
 				e.printStackTrace();
 			}
-	        
+			
+			found = 0;
+			this.sensorAmt = sensorAmt;
 		}
-		
+
 		@Override
 		public void run(){
 			try {
@@ -70,7 +78,7 @@ public class UDPGridPopulator extends GridPopulator {
 	            byte[] buffer = new byte[2048];
 	 
 	            DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
-	            while (!stop) {
+	            while (!stop && (sensorAmt <= 0 || sensorAmt > found)) {
 	                try{
 	                	dsocket.receive(packet);
 	                } catch (SocketTimeoutException e){
@@ -83,13 +91,15 @@ public class UDPGridPopulator extends GridPopulator {
 	                
 	                EthernetSensor s = construct(message);
 	                
-	                if(s != null){
+	                if(s != null && msg.getSensor(s.getName()) == null){
 	                	msg.addSensor(s);
 	                	System.out.println("Adding sensor " + s);
+	                	found++;
 	                }
 	            }
 	            
 	            dsocket.close();
+	            stop = true;
 	            
 	        } catch (SocketException e) {
 	        	if(!stop)
@@ -133,6 +143,11 @@ public class UDPGridPopulator extends GridPopulator {
 		
 		
 		return sensor;
+	}
+
+	@Override
+	public boolean running() {
+		return !p.stop;
 	}
 
 }

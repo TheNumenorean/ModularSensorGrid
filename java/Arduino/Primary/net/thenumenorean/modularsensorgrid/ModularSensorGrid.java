@@ -73,7 +73,7 @@ public class ModularSensorGrid {
 	
 	public void addDataCaptureTool(DataCaptureTool d){
 		if(started)
-			throw new EthernetSensorGridException("Cannot add DataCaptureTool after start!");
+			throw new SensorGridException("Cannot add DataCaptureTool after start!");
 		
 		captureTools.add(d);
 	}

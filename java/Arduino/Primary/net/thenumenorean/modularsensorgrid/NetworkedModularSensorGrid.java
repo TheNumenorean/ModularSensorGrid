@@ -40,7 +40,7 @@ public class NetworkedModularSensorGrid extends ModularSensorGrid {
 	public void addSensor(Sensor s){
 		
 		if(started)
-			throw new EthernetSensorGridException("Cannot add sensor after start!");
+			throw new SensorGridException("Cannot add sensor after start!");
 		
 		if(!(s instanceof EthernetSensor))
 			return;
@@ -50,7 +50,7 @@ public class NetworkedModularSensorGrid extends ModularSensorGrid {
 	public boolean synchronizeTime(){
 		
 		if(!started)
-			throw new EthernetSensorGridException("Ethernet grid must be started to sync time!");
+			throw new SensorGridException("Ethernet grid must be started to sync time!");
 		
 		try {
 			
@@ -138,7 +138,7 @@ public class NetworkedModularSensorGrid extends ModularSensorGrid {
 					Thread.sleep(interval);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
-				} catch (EthernetSensorGridException e){
+				} catch (SensorGridException e){
 					break;
 				}
 			}

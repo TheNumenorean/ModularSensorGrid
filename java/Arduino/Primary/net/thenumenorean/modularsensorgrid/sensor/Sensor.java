@@ -5,7 +5,7 @@ package net.thenumenorean.modularsensorgrid.sensor;
 
 import java.util.ArrayList;
 
-import net.thenumenorean.modularsensorgrid.EthernetSensorGridException;
+import net.thenumenorean.modularsensorgrid.SensorGridException;
 import net.thenumenorean.modularsensorgrid.datacapture.DataCaptureTool;
 
 /**
