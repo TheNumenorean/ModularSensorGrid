@@ -54,6 +54,7 @@ public class ModularSensorGrid {
 	}
 	
 	public void destroy(){
+		stop();
 		for(Sensor s : sensors)
 			s.destroy();
 	}

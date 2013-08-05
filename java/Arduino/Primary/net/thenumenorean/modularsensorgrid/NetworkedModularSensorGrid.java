@@ -77,7 +77,11 @@ public class NetworkedModularSensorGrid extends ModularSensorGrid {
 		
 		super.start();
 		
-		
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		
 		start_time = System.currentTimeMillis();
 		

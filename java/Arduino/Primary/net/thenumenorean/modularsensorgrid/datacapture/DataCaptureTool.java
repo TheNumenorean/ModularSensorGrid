@@ -11,7 +11,7 @@ import net.thenumenorean.modularsensorgrid.sensor.Sensor;
  */
 public interface DataCaptureTool {
 	
-	public void addData(Sensor s, String dataName, long time, Object value);
+	//public void addData(Sensor s, String dataName, long time, Object value);
 	public void addData(Sensor s, String dataName, long time, int value);
 	public void addData(Sensor s, String dataName, long time, boolean value);
 	public void addData(Sensor s, String dataName, long time, long value);

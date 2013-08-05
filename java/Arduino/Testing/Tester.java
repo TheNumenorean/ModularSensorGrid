@@ -2,6 +2,7 @@ import java.io.IOException;
 
 import net.thenumenorean.modularsensorgrid.GridCreator;
 import net.thenumenorean.modularsensorgrid.ModularSensorGrid;
+import net.thenumenorean.modularsensorgrid.datacapture.GraphicalCaptureTool;
 import net.thenumenorean.modularsensorgrid.sensor.LightSensor;
 
 public class Tester {
@@ -9,12 +10,10 @@ public class Tester {
 	public static void main(String[] args) throws InterruptedException, IOException {
 		
 		ModularSensorGrid msg = GridCreator.constructNewNetworkGrid(10000, 1);
-		System.err.println("Done");
 		LightSensor l = (LightSensor) msg.getSensor("LightSensor1");
 		
+		msg.addDataCaptureTool(new GraphicalCaptureTool());
 		msg.start();
-		
-		Thread.sleep(2000);
 
 		while (l.isConnected() && (System.in.available() <= 0 || System.in.read() != '\n')) {
 			
@@ -32,8 +31,6 @@ public class Tester {
 
 			Thread.sleep(100);
 		}
-		
-		msg.stop();
 
 		msg.destroy();
 

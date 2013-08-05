@@ -144,6 +144,8 @@ void loop() {
   } else {
     
     if(client.connected()){
+      while((millis() - start_time) % 5 > 0)
+        ;
       dataClient.print(millis() - start_time);
       dataClient.print(" ");
       dataClient.println(analogRead(0));
@@ -153,11 +155,7 @@ void loop() {
     }
   }
   
-  
   Serial.println(millis() - millOld);
-  
-  //long time_goal = 
-  delay(10);
   
 }
 
