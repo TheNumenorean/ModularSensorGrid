@@ -5,7 +5,6 @@ package net.thenumenorean.modularsensorgrid.sensor;
 
 import java.util.ArrayList;
 
-import net.thenumenorean.modularsensorgrid.SensorGridException;
 import net.thenumenorean.modularsensorgrid.datacapture.DataCaptureTool;
 
 /**
@@ -23,6 +22,12 @@ public interface Sensor {
 	 * Tells this sensor to stop capturing data.
 	 */
 	public void stop();
+	
+	/**
+	 * Returns whether this sensor is currently running
+	 * @return True if it is
+	 */
+	public boolean isRunning();
 	
 	/**
 	 * Adds a datacapturetool to this Sensor that will be used to store data 

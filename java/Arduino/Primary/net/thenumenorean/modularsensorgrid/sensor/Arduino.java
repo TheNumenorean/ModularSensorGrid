@@ -11,13 +11,18 @@ public abstract class Arduino extends EthernetSensor {
 
 	private String name;
 	private double version;
+	private int dataPort;
 
-	public Arduino(String name, double version, String ip, int port)
+	public Arduino(String name, double version, String ip, int port, int dataPort)
 			throws UnknownHostException, IOException {
 		super(ip, port);
 		setName(name);
 		this.version = version;
-		
+		this.dataPort = dataPort;
+	}
+	
+	protected Socket getDataSocket() throws UnknownHostException, IOException{
+		return new Socket(this.getIP(), dataPort);
 	}
 	
 	protected String sendCommand(String s){
@@ -73,6 +78,10 @@ public abstract class Arduino extends EthernetSensor {
 	@Override
 	public void setName(String name) {
 		this.name = name;
+	}
+	
+	public int getDataPort(){
+		return dataPort;
 	}
 
 	/**

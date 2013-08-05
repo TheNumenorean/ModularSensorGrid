@@ -13,6 +13,7 @@ public class ModularSensorGrid {
 	protected boolean started;
 
 	public ModularSensorGrid() {
+		captureTools = new ArrayList<DataCaptureTool>();
 		sensors = new ArrayList<Sensor>();
 		started = false;
 	}
@@ -59,6 +60,10 @@ public class ModularSensorGrid {
 	
 	public void stop(){
 		started = false;
+		for(Sensor s : sensors){
+			s.stop();
+			s.getDataCaptureTools().clear();
+		}
 	}
 	
 	public void start(){

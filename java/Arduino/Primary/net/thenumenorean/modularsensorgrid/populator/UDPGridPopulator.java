@@ -12,7 +12,6 @@ import java.net.SocketTimeoutException;
 import net.thenumenorean.modularsensorgrid.ModularSensorGrid;
 import net.thenumenorean.modularsensorgrid.sensor.EthernetSensor;
 import net.thenumenorean.modularsensorgrid.sensor.LightSensor;
-import net.thenumenorean.modularsensorgrid.sensor.Sensor;
 
 /**
  * @author The Numenorean
@@ -112,7 +111,6 @@ public class UDPGridPopulator extends GridPopulator {
 
 		public void halt() {
 			stop = true;
-			System.out.println("Killing");
 			dsocket.close();
 		}
 
@@ -124,7 +122,7 @@ public class UDPGridPopulator extends GridPopulator {
 		
 		String[] args = s.split(" ");
 		
-		if(args.length < 6)
+		if(args.length < 7)
 			return null;
 		
 		if(args[0].equals("Arduino")){
@@ -132,7 +130,9 @@ public class UDPGridPopulator extends GridPopulator {
 			if(args[1].equals("LightSensor")){
 				
 				try {
-					sensor = new LightSensor(args[3], Double.parseDouble(args[2]), args[4], Integer.parseInt(args[5]));
+					System.out.println("Loading Sensor...");
+					sensor = new LightSensor(args[3], Double.parseDouble(args[2]), args[4], Integer.parseInt(args[5]), Integer.parseInt(args[6]));
+					System.out.println("Connected");
 				} catch (IOException e){
 					System.out.println("Error loading sensor: " + e.getCause() + ": " + e.getMessage());
 				}

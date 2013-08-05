@@ -87,7 +87,8 @@ public class NetworkedModularSensorGrid extends ModularSensorGrid {
 	}
 	
 	public void stop(){
-		syncer.halt();
+		if(syncer != null)
+			syncer.halt();
 		super.stop();
 		
 	}

@@ -20,6 +20,7 @@ public abstract class EthernetSensor implements Sensor {
 		this.ip = ip;
 		this.port = port;
 		hello = reconnect();
+		captureTools = new ArrayList<DataCaptureTool>();
 
 	}
 

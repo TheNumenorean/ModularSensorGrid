@@ -7,6 +7,7 @@
 #define BUTTON 2
 #define BROAD_PORT 22001
 #define SERV_PORT 22000
+#define DATA_PORT 22002
 
 // Enter a MAC address and IP address for your controller below.
 // The IP address will be dependent on your local network:
@@ -20,10 +21,15 @@ String name = "LightSensor1";
 String vers = "1.0";
 
 EthernetServer server(SERV_PORT);
+EthernetServer dataServer(DATA_PORT);
 EthernetClient client;
+EthernetClient dataClient;
 String clientCommand;
 
+boolean clientConnected = false;
+boolean dataClientConnected = false;
 boolean last_press = false;
+long start_time;
 long millOld;
 
 void setup() {
@@ -41,9 +47,8 @@ void setup() {
     Ethernet.begin(mac, ip);
   }
   
-  //Ethernet.begin(mac, ip);
-  
   server.begin();
+  dataServer.begin();
   Serial.print("Server is at ");
   Serial.println(Ethernet.localIP());
   
@@ -59,41 +64,24 @@ void loop() {
   
   millOld = millis();
   
-  if(client == null){
+  if(!clientConnected){
+    
     //No connection so check for new Connection
     EthernetClient tmp = server.available();
     
-    if(tmp == true){  
+    if(tmp == true){
       Serial.println("New client");
       digitalWrite(STATUS, HIGH);
       client = tmp;
       clientCommand = "";
-      numClients++;
+      clientConnected = true;
       tmp.println("Arduino LightSensor v" + vers);
       
     } else {
       
       //If no new connection broadcast location
-      Udp.beginPacket("255.255.255.255", BROAD_PORT);
-    
-      String tmp = "Arduino LightSensor " + vers + " " + name + " ";
-    
-      boolean start = true;
-      for (byte thisByte = 0; thisByte < 4; thisByte++) {
-        if(start) start = false;
-        else
-          tmp.concat("."); 
-        tmp.concat(Ethernet.localIP()[thisByte]);
-      }
-    
-      tmp.concat(" ");
-      tmp.concat(SERV_PORT);
-      tmp.concat(" "); //Cuts off last char
-    
-      char chars[tmp.length()];
-      tmp.toCharArray(chars, tmp.length());
-      Udp.write(chars);
-      Udp.endPacket();
+      Serial.println("Broadcasting");
+      broadcast();
       
       //Flash status
       digitalWrite(STATUS, !digitalRead(STATUS));
@@ -103,7 +91,7 @@ void loop() {
     }
     
   } else {
-    //The client is connected
+    //The client exists
     
     if(client.connected()){
       
@@ -123,22 +111,52 @@ void loop() {
       //If client was disconnected remove them.
       Serial.println("Client disonnected");
       client.stop();
-      client = null;
+      //Kill dataclient too
+      dataClient.stop();
+      clientConnected = false;
       digitalWrite(STATUS, LOW);
       
     }
     
   }
   
+  /*
   if(digitalRead(BUTTON) != last_press && digitalRead(BUTTON)){
     //Button pressed
   }
   
   last_press = digitalRead(BUTTON);
+  */
+  
+  Serial.print(millis() - millOld);
+  Serial.print(" ");
+  
+  if(!dataClientConnected){
+    EthernetClient dataTmp = dataServer.available();
+    
+    if(dataTmp){
+      dataClient = dataTmp;
+      start_time = millis();
+      dataClientConnected = true;
+      Serial.println("Data client connected!");
+    }
+    
+  } else {
+    
+    if(client.connected()){
+      dataClient.print(millis() - start_time);
+      dataClient.print(" ");
+      dataClient.println(analogRead(0));
+    } else {
+      dataClient.stop();
+      dataClientConnected = false;
+    }
+  }
+  
   
   Serial.println(millis() - millOld);
   
-  
+  //long time_goal = 
   delay(10);
   
 }
@@ -153,8 +171,17 @@ void interpretCommand(String com, EthernetClient client){
   int cnt = split(com, ' ', args);
   
   if (args[0] == "data") {
-    int sensorReading = analogRead(0);
-    client.println(sensorReading);
+    
+    if(args[1] == "start"){
+      digitalWrite(EXTRA, HIGH);
+      Serial.println("Turning light on");
+    } else if(args[1] == "") {
+      int sensorReading = analogRead(0);
+      client.println(sensorReading);
+    } else {
+      client.println("Unknown parameter " + args[1]);
+    }
+    
   } else if(args[0] == "light"){
     
     if(args[1] == "on"){
@@ -192,4 +219,29 @@ int split(String s, char c, String strs[]){
   
   return cnt;
   
+}
+
+void broadcast(){
+  Udp.beginPacket("255.255.255.255", BROAD_PORT);
+    
+  String tmp = "Arduino LightSensor " + vers + " " + name + " ";
+  
+  boolean start = true;
+  for (byte thisByte = 0; thisByte < 4; thisByte++) {
+    if(start) start = false;
+     else
+      tmp.concat("."); 
+    tmp.concat(Ethernet.localIP()[thisByte]);
+  }
+   
+  tmp.concat(" ");
+  tmp.concat(SERV_PORT);
+  tmp.concat(" "); //Cuts off last char
+  tmp.concat(DATA_PORT);
+  tmp.concat(" ");
+  
+  char chars[tmp.length()];
+  tmp.toCharArray(chars, tmp.length());
+  Udp.write(chars);
+  Udp.endPacket();
 }
