@@ -5,6 +5,8 @@ package net.thenumenorean.modularsensorgrid.datacapture;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.util.Collections;
+import java.util.Map;
 import java.util.TreeMap;
 
 import javax.swing.BorderFactory;
@@ -32,12 +34,12 @@ public class GraphicalCaptureTool extends JFrame implements DataCaptureTool {
 	 */
 	public GraphicalCaptureTool() {
 		sensors = new TreeMap<String, SensorContainer>();
-		
+
 		this.setSize(700, 700);
-		
+
 		height = 150;
 		width = 600;
-		
+
 		this.setVisible(true);
 	}
 
@@ -45,9 +47,9 @@ public class GraphicalCaptureTool extends JFrame implements DataCaptureTool {
 	public void addData(Sensor s, String dataName, long time, int value) {
 		SensorContainer list = getSensorContainer(s);
 
-		SensorData<Integer> data = (SensorData<Integer>) list.getSensorData(dataName);
+		SensorData data = list.getSensorData(dataName);
 		if (data == null) {
-			data = new SensorData<Integer>();
+			data = new SensorData();
 			list.addSensorData(dataName, data);
 		}
 
@@ -58,13 +60,13 @@ public class GraphicalCaptureTool extends JFrame implements DataCaptureTool {
 	public void addData(Sensor s, String dataName, long time, boolean value) {
 		SensorContainer list = getSensorContainer(s);
 
-		SensorData<Boolean> data = (SensorData<Boolean>) list.getSensorData(dataName);
+		SensorData data = list.getSensorData(dataName);
 		if (data == null) {
-			data = new SensorData<Boolean>();
+			data = new SensorData();
 			list.addSensorData(dataName, data);
 		}
 
-		data.addValue(time, value);
+		data.addValue(time, value ? 1 : 0);
 
 	}
 
@@ -72,9 +74,9 @@ public class GraphicalCaptureTool extends JFrame implements DataCaptureTool {
 	public void addData(Sensor s, String dataName, long time, long value) {
 		SensorContainer list = getSensorContainer(s);
 
-		SensorData<Long> data = (SensorData<Long>) list.getSensorData(dataName);
+		SensorData data = (SensorData) list.getSensorData(dataName);
 		if (data == null) {
-			data = new SensorData<Long>();
+			data = new SensorData();
 			list.addSensorData(dataName, data);
 		}
 
@@ -86,9 +88,9 @@ public class GraphicalCaptureTool extends JFrame implements DataCaptureTool {
 	public void addData(Sensor s, String dataName, long time, double value) {
 		SensorContainer list = getSensorContainer(s);
 
-		SensorData<Double> data = (SensorData<Double>) list.getSensorData(dataName);
+		SensorData data = (SensorData) list.getSensorData(dataName);
 		if (data == null) {
-			data = new SensorData<Double>();
+			data = new SensorData();
 			list.addSensorData(dataName, data);
 		}
 
@@ -98,99 +100,113 @@ public class GraphicalCaptureTool extends JFrame implements DataCaptureTool {
 
 	private SensorContainer getSensorContainer(Sensor s) {
 		SensorContainer list = sensors.get(s.getName());
-		if (list == null){
+		if (list == null) {
 			list = new SensorContainer();
-			sensors.put(s.getName(),list);
+			sensors.put(s.getName(), list);
 			this.getContentPane().add(list);
 			repaint();
 		}
-					
+
 		return list;
 	}
-	
-	private class SensorContainer  extends JComponent {
-		
+
+	private class SensorContainer extends JComponent {
+
 		/**
 		 * 
 		 */
 		private static final long serialVersionUID = 2721174287672393834L;
-		TreeMap<String, SensorData<?>> data;
+		TreeMap<String, SensorData> data;
 		private JPanel container;
-		
-		public SensorContainer(){
-			data = new TreeMap<String, SensorData<?>>();
-			
+
+		public SensorContainer() {
+			data = new TreeMap<String, SensorData>();
+
 			this.setBorder(BorderFactory.createLineBorder(Color.GREEN));
 			this.setBackground(Color.GRAY);
 			this.setSize(width, height);
-			
+
 			container = new JPanel();
 		}
-		
-		public SensorData<?> getSensorData(String name){
+
+		public SensorData getSensorData(String name) {
 			return data.get(name);
 		}
-		
-		public void addSensorData(String name, SensorData<?> sd){
+
+		public void addSensorData(String name, SensorData sd) {
 			data.put(name, sd);
-			sd.setDimensions(width, height, 100);
+			sd.setDimensions(width, height);
 		}
-		
+
 		@Override
-		protected void paintComponent(Graphics g){
+		protected void paintComponent(Graphics g) {
 			super.paintComponent(g);
 
-			for(SensorData<?> sd : data.values())
+			for (SensorData sd : data.values())
 				sd.paint(g);
-			
+
 		}
-		
+
 	}
 
-	private class SensorData<A> {
+	private class SensorData {
 
-		private TreeMap<Long, A> values;
+		private Map<Long, Double> values;
 		private int height;
 		private int width;
 		private int increment;
 		private Color c;
 		private int show;
-		private A highest;
+		private double highest;
+		int lastHeight;
 
 		public SensorData() {
-			values = new TreeMap<Long, A>();
+			values = Collections.synchronizedMap(new TreeMap<Long, Double>());
 			c = Color.BLACK;
 			show = 250;
+			lastHeight = 0;
 		}
 
 		public void setDimensions(int width, int height) {
 			this.width = width;
 			this.height = height;
 		}
-		
-		public void setColor(Color c){
+
+		public void setColor(Color c) {
 			this.c = c;
 		}
-		
-		public void setShow(int show){
+
+		public void setShow(int show) {
 			this.show = show;
 		}
 
-		public void addValue(long time, A value) {
+		public void addValue(long time, double value) {
 			values.put(time, value);
-			if(value > highest)
-				value = highest;
+			if (value > highest)
+				highest = value;
 			repaint();
 		}
-		
-		public void paint(Graphics g, int margin){
-			
+
+		public void paint(Graphics g) {
+
 			g.setColor(c);
+			double pixls = width / show;
+			int margin = 0;
 			
-			for(int y = 0; y < 250; y++){
-				
+			synchronized (values) {
+				for (int y = 1; y <= 300 && y <= values.size(); y++) {
+					int newHeight = (int) ((values
+							.get(values.keySet().toArray()[values.size() - y]) / highest)
+							* height);
+					System.out.println(newHeight + " " + margin + " " + highest + " " + values
+							.get(values.keySet().toArray()[values.size() - y]));
+					g.drawLine(width - margin, height - lastHeight,width - (int) (margin + pixls),
+							height - newHeight);
+					margin += pixls;
+					lastHeight = newHeight;
+				}
 			}
-			g.drawLine(0, 0, 100, 100);
+
 		}
 
 	}
