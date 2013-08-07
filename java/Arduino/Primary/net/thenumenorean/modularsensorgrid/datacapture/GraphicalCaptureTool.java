@@ -6,14 +6,14 @@ package net.thenumenorean.modularsensorgrid.datacapture;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Queue;
 import java.util.TreeMap;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JPanel;
-
 import net.thenumenorean.modularsensorgrid.sensor.Sensor;
 
 /**
@@ -41,61 +41,43 @@ public class GraphicalCaptureTool extends JFrame implements DataCaptureTool {
 		width = 600;
 
 		this.setVisible(true);
+		
+		new Thread(){
+			@Override
+			public void run(){
+				
+				while(1 == 1){
+					repaint();
+					try {
+						Thread.sleep(10);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}.start();
 	}
 
 	@Override
 	public void addData(Sensor s, String dataName, long time, int value) {
-		SensorContainer list = getSensorContainer(s);
 
-		SensorData data = list.getSensorData(dataName);
-		if (data == null) {
-			data = new SensorData();
-			list.addSensorData(dataName, data);
-		}
-
-		data.addValue(time, value);
+		addData(s, dataName, time, (double) value);
 	}
 
 	@Override
 	public void addData(Sensor s, String dataName, long time, boolean value) {
-		SensorContainer list = getSensorContainer(s);
-
-		SensorData data = list.getSensorData(dataName);
-		if (data == null) {
-			data = new SensorData();
-			list.addSensorData(dataName, data);
-		}
-
-		data.addValue(time, value ? 1 : 0);
-
+		addData(s, dataName, time, value ? 1.0 : 0.0);
 	}
 
 	@Override
 	public void addData(Sensor s, String dataName, long time, long value) {
-		SensorContainer list = getSensorContainer(s);
-
-		SensorData data = (SensorData) list.getSensorData(dataName);
-		if (data == null) {
-			data = new SensorData();
-			list.addSensorData(dataName, data);
-		}
-
-		data.addValue(time, value);
-
+		addData(s, dataName, time, (double) value);
 	}
 
 	@Override
 	public void addData(Sensor s, String dataName, long time, double value) {
 		SensorContainer list = getSensorContainer(s);
-
-		SensorData data = (SensorData) list.getSensorData(dataName);
-		if (data == null) {
-			data = new SensorData();
-			list.addSensorData(dataName, data);
-		}
-
-		data.addValue(time, value);
-
+		list.addValue(dataName, time, value);
 	}
 
 	private SensorContainer getSensorContainer(Sensor s) {
@@ -117,7 +99,7 @@ public class GraphicalCaptureTool extends JFrame implements DataCaptureTool {
 		 */
 		private static final long serialVersionUID = 2721174287672393834L;
 		TreeMap<String, SensorData> data;
-		private JPanel container;
+		private Queue<Color> colors;
 
 		public SensorContainer() {
 			data = new TreeMap<String, SensorData>();
@@ -126,7 +108,34 @@ public class GraphicalCaptureTool extends JFrame implements DataCaptureTool {
 			this.setBackground(Color.GRAY);
 			this.setSize(width, height);
 
-			container = new JPanel();
+			colors = new LinkedList<Color>();
+
+			colors.add(Color.BLUE);
+			colors.add(Color.CYAN);
+			colors.add(Color.DARK_GRAY);
+			colors.add(Color.GRAY);
+			colors.add(Color.GREEN);
+			colors.add(Color.LIGHT_GRAY);
+			colors.add(Color.MAGENTA);
+			colors.add(Color.ORANGE);
+			colors.add(Color.PINK);
+			colors.add(Color.RED);
+			colors.add(Color.WHITE);
+			colors.add(Color.YELLOW);
+			colors.add(Color.BLACK);
+
+		}
+
+		public void addValue(String dataName, long time, double value) {
+
+			SensorData data = getSensorData(dataName);
+			if (data == null) {
+				data = new SensorData(colors.poll());
+				addSensorData(dataName, data);
+			}
+
+			data.addValue(time, value);
+
 		}
 
 		public SensorData getSensorData(String name) {
@@ -136,15 +145,14 @@ public class GraphicalCaptureTool extends JFrame implements DataCaptureTool {
 		public void addSensorData(String name, SensorData sd) {
 			data.put(name, sd);
 			sd.setDimensions(width, height);
+			this.invalidate();
 		}
 
 		@Override
 		protected void paintComponent(Graphics g) {
 			super.paintComponent(g);
-
 			for (SensorData sd : data.values())
 				sd.paint(g);
-
 		}
 
 	}
@@ -154,16 +162,15 @@ public class GraphicalCaptureTool extends JFrame implements DataCaptureTool {
 		private Map<Long, Double> values;
 		private int height;
 		private int width;
-		private int increment;
 		private Color c;
-		private int show;
+		private int range;
 		private double highest;
 		int lastHeight;
 
-		public SensorData() {
+		public SensorData(Color color) {
 			values = Collections.synchronizedMap(new TreeMap<Long, Double>());
-			c = Color.BLACK;
-			show = 250;
+			c = color;
+			range = 250;
 			lastHeight = 0;
 		}
 
@@ -176,35 +183,32 @@ public class GraphicalCaptureTool extends JFrame implements DataCaptureTool {
 			this.c = c;
 		}
 
-		public void setShow(int show) {
-			this.show = show;
+		public void setRange(int range) {
+			this.range = range;
 		}
 
 		public void addValue(long time, double value) {
 			values.put(time, value);
 			if (value > highest)
 				highest = value;
-			repaint();
 		}
 
 		public void paint(Graphics g) {
 
 			g.setColor(c);
-			double pixls = width / show;
+			double pixls = width / range;
 			int margin = 0;
 			
-			synchronized (values) {
-				for (int y = 1; y <= 300 && y <= values.size(); y++) {
-					int newHeight = (int) ((values
-							.get(values.keySet().toArray()[values.size() - y]) / highest)
-							* height);
-					System.out.println(newHeight + " " + margin + " " + highest + " " + values
-							.get(values.keySet().toArray()[values.size() - y]));
-					g.drawLine(width - margin, height - lastHeight,width - (int) (margin + pixls),
-							height - newHeight);
-					margin += pixls;
-					lastHeight = newHeight;
-				}
+			double scalar = height / highest;
+			
+			
+			for (int y = 1; y <= 300 && y <= values.size(); y++) {
+				int newHeight = (int) ((Double)values.values().toArray()[values.size() - y] * scalar);
+				//System.out.println(newHeight + " " + margin + " " + highest);
+				g.drawLine(width - margin, height - lastHeight, width
+						- (int) (margin += pixls), height - newHeight);
+				
+				lastHeight = newHeight;
 			}
 
 		}
