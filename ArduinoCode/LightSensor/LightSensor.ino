@@ -148,10 +148,13 @@ void loop() {
         ;
       dataClient.print(millis() - start_time);
       dataClient.print(" ");
-      dataClient.println(analogRead(0));
+      dataClient.print(analogRead(0));
+      dataClient.print(" ");
+      dataClient.println(digitalRead(EXTRA));
     } else {
       dataClient.stop();
       dataClientConnected = false;
+      Serial.println("Data client disconnected");
     }
   }
   

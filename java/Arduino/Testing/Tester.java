@@ -14,7 +14,7 @@ public class Tester {
 		
 		msg.addDataCaptureTool(new GraphicalCaptureTool());
 		msg.start();
-
+		
 		while (l.isConnected() && (System.in.available() <= 0 || System.in.read() != '\n')) {
 			
 			long mil = System.currentTimeMillis();
@@ -31,8 +31,12 @@ public class Tester {
 
 			Thread.sleep(100);
 		}
+		
+		System.err.println("Here");
 
 		msg.destroy();
+		
+		System.exit(0);
 
 	}
 

@@ -127,7 +127,7 @@ public class LightSensor extends Arduino {
 		//<timeMS> <value>
 		String[] values = data.trim().split(" ");
 		
-		if(values.length < 2){
+		if(values.length < 3){
 			System.out.println("Invalid sensor data! Invalid number of args");
 			return;
 		}
@@ -148,14 +148,23 @@ public class LightSensor extends Arduino {
 			return;
 		}
 		
+		boolean status;
+		try {
+			status = Integer.parseInt(values[2]) == 1 ? true : false;
+		} catch (NumberFormatException e){
+			System.out.println("Invalid sensor data! Invalid value!");
+			return;
+		}
+		
 		lastSensorValue = value;
 		lastSensorRead = time;
 		
 		for(DataCaptureTool tool : this.getDataCaptureTools()){
 			tool.addData(this, "Light Resistor", time, value);
+			tool.addData(this, "Light Output", time, status);
 		}
 		
-		System.out.println("Added data with time " + time + " and value " + value);
+		System.out.println("Added data with time " + time + " and value " + value + " with light " + status);
 		
 	}
 
