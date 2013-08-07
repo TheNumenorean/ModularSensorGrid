@@ -12,6 +12,7 @@ public class LightSensor extends Arduino {
 	private SensorRunner runner;
 	private int lastSensorValue;
 	private long lastSensorRead;
+	private boolean currentLightStatus;
 
 	public LightSensor(String name, double version, String ip, int port, int dataPort)
 			throws UnknownHostException, IOException {
@@ -40,6 +41,7 @@ public class LightSensor extends Arduino {
 	}
 	
 	public void setLight(boolean on){
+		if(isRunning() && currentLightStatus != on)
 		sendCommand("light " + (on ? "on" : "off"));
 	}
 
@@ -158,6 +160,7 @@ public class LightSensor extends Arduino {
 		
 		lastSensorValue = value;
 		lastSensorRead = time;
+		currentLightStatus = status;
 		
 		for(DataCaptureTool tool : this.getDataCaptureTools()){
 			tool.addData(this, "Light Resistor", time, value);
