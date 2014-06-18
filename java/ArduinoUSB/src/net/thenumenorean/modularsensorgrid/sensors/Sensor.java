@@ -5,7 +5,7 @@ package net.thenumenorean.modularsensorgrid.sensors;
 
 import java.util.ArrayList;
 
-import net.thenumenorean.modularsensorgrid.connectors.Connector;
+import net.thenumenorean.modularsensorgrid.connector.Connector;
 import net.thenumenorean.modularsensorgrid.datacapture.DataCaptureTool;
 
 /**
@@ -18,8 +18,9 @@ public abstract class Sensor {
 	private String name;
 	private ArrayList<DataCaptureTool> dataCaptureTools;
 
-	public Sensor(Connector c){
+	public Sensor(String name, Connector c){
 		connector = c;
+		this.name = name;
 		dataCaptureTools = new ArrayList<DataCaptureTool>();
 	}
 	

@@ -1,7 +1,7 @@
 package net.thenumenorean.modularsensorgrid.sensors;
 
-import net.thenumenorean.modularsensorgrid.connectors.AnalogChangeListener;
-import net.thenumenorean.modularsensorgrid.connectors.Connector;
+import net.thenumenorean.modularsensorgrid.connector.AnalogChangeListener;
+import net.thenumenorean.modularsensorgrid.connector.Connector;
 import net.thenumenorean.modularsensorgrid.datacapture.DataCaptureTool;
 
 public class LightSensor extends Sensor {
@@ -9,8 +9,8 @@ public class LightSensor extends Sensor {
 	private boolean running;
 	private int currentValue;
 
-	public LightSensor(Connector c) {
-		super(c);
+	public LightSensor(String name, Connector c) {
+		super(name, c);
 		running = false;
 	}
 
