@@ -1,4 +1,4 @@
-package net.thenumenorean.modularsensorgrid.connectors;
+package net.thenumenorean.modularsensorgrid.connector;
 
 public interface Connector {
 	
