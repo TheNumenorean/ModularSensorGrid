@@ -110,7 +110,7 @@ public abstract class Sensor {
 	}
 	
 	public void setStatusLight(boolean on){
-		connector.setDigitalPin(2, true);
+		connector.setDigitalPin(2, on);
 	}
 	
 }
