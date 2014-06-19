@@ -16,15 +16,20 @@ public class USBTester {
 		msg.addDataCaptureTool(new GraphicalCaptureTool());
 		msg.start();
 		
+		boolean lastStatus = false;
+		
 		while (System.in.available() < 1) {
 			
 			double num = l.getLightIntensity();
-			System.out.println(num);
+			//System.out.println(num);
 
-			if (num > 700)
+			if (num > 700 && !lastStatus){
+				lastStatus = true;
 				l.setStatusLight(true);
-			else
+			}else if(num <= 700 && lastStatus){
+				lastStatus = false;
 				l.setStatusLight(false);
+			}
 
 			Thread.sleep(100);
 		}
