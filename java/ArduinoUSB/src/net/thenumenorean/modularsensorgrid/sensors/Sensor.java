@@ -109,6 +109,10 @@ public abstract class Sensor {
 		return ((Sensor)o).getName().equals(this.getName());
 	}
 	
+	/**
+	 * Sets the status light on or off. Defaults to digital pin 2
+	 * @param on Whether to turn the light on or off.
+	 */
 	public void setStatusLight(boolean on){
 		connector.setDigitalPin(2, on);
 	}

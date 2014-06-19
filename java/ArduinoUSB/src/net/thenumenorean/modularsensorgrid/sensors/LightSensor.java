@@ -29,7 +29,7 @@ public class LightSensor extends Sensor {
 					DataCaptureToolHelper.addData(getDataCaptureTools(),
 							LightSensor.this, "Light Intensity", timestamp,
 							value);
-					System.out.println(timestamp + "\t" + value);
+					//System.out.println(timestamp + "\t" + value);
 				}
 			}
 
@@ -55,6 +55,10 @@ public class LightSensor extends Sensor {
 		return "Light Sensor";
 	}
 
+	/**
+	 * Gets the last value retrieved from the sensor
+	 * @return
+	 */
 	public int getLightIntensity() {
 		return currentValue;
 	}
