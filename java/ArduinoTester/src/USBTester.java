@@ -11,7 +11,7 @@ public class USBTester {
 		
 		ModularSensorGrid msg = new ModularSensorGrid();
 		ArdulinkGridPopulator.populate(msg);
-		LightSensor l = (LightSensor) msg.getSensor("LightSensor1");
+		LightSensor l = (LightSensor) msg.getSensor("Sensor Name");
 		
 		msg.addDataCaptureTool(new GraphicalCaptureTool());
 		msg.start();
