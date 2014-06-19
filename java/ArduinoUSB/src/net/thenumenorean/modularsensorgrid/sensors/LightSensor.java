@@ -2,12 +2,13 @@ package net.thenumenorean.modularsensorgrid.sensors;
 
 import net.thenumenorean.modularsensorgrid.connector.AnalogChangeListener;
 import net.thenumenorean.modularsensorgrid.connector.Connector;
-import net.thenumenorean.modularsensorgrid.datacapture.DataCaptureTool;
+import net.thenumenorean.modularsensorgrid.datacapture.DataCaptureToolHelper;
 
 public class LightSensor extends Sensor {
 
 	private boolean running;
 	private int currentValue;
+	private long startTime;
 
 	public LightSensor(String name, Connector c) {
 		super(name, c);
@@ -16,31 +17,22 @@ public class LightSensor extends Sensor {
 
 	@Override
 	public void start() {
+		startTime = System.currentTimeMillis();
 		Connector c = getConnector();
 		c.setReportAnalogChanges(0, true);
-		c.addAnalogChangeListener(new AnalogChangeListener(){
+		c.addAnalogChangeListener(new AnalogChangeListener() {
 
 			@Override
 			public void onAnalogChange(int pin, int value, long timestamp) {
-				if(pin == 0)
-				currentValue = value;
-				
-				for(DataCaptureTool dct : LightSensor.this.getDataCaptureTools()){
-					
-					dct.addData(LightSensor.this, "Light Intensity", timestamp, value);
-					
-					
-					/*EventQueue.invokeLater(new Runnable(){
-
-						@Override
-						public void run() {
-							dct.addData(LightSensor.this, "Light Intensity", timestamp, value);
-							
-						}
-					});*/
+				if (pin == 0) {
+					currentValue = value;
+					DataCaptureToolHelper.addData(getDataCaptureTools(),
+							LightSensor.this, "Light Intensity", timestamp,
+							value);
+					System.out.println(timestamp + "\t" + value);
 				}
 			}
-			
+
 		});
 		running = true;
 
@@ -62,9 +54,16 @@ public class LightSensor extends Sensor {
 	public String getType() {
 		return "Light Sensor";
 	}
-	
-	public int getLightIntensity(){
+
+	public int getLightIntensity() {
 		return currentValue;
+	}
+
+	@Override
+	public void setStatusLight(boolean on) {
+		super.setStatusLight(on);
+		DataCaptureToolHelper.addData(getDataCaptureTools(), this,
+				"Status Light", System.currentTimeMillis() - startTime, on);
 	}
 
 }
