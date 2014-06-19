@@ -18,12 +18,8 @@ public class USBTester {
 		
 		while (System.in.available() < 1) {
 			
-			long mil = System.currentTimeMillis();
 			double num = l.getLightIntensity();
-			if(num == -1)
-				break;
-			mil = System.currentTimeMillis() - mil;
-			System.out.println(num + " " + mil);
+			System.out.println(num);
 
 			if (num > 700)
 				l.setStatusLight(true);
