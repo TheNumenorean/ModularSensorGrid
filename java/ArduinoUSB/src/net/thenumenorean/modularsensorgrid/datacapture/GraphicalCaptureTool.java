@@ -5,11 +5,13 @@ package net.thenumenorean.modularsensorgrid.datacapture;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.util.Collections;
+import java.util.AbstractMap;
+import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
@@ -42,12 +44,12 @@ public class GraphicalCaptureTool extends JFrame implements DataCaptureTool {
 		width = 600;
 
 		this.setVisible(true);
-		
-		new Thread(){
+
+		new Thread() {
 			@Override
-			public void run(){
-				
-				while(1 == 1){
+			public void run() {
+
+				while (1 == 1) {
 					repaint();
 					try {
 						Thread.sleep(10);
@@ -160,7 +162,7 @@ public class GraphicalCaptureTool extends JFrame implements DataCaptureTool {
 
 	private class SensorData {
 
-		private Map<Long, Double> values;
+		private ConcurrentLinkedQueue<Entry<Long, Double>> values;
 		private int height;
 		private int width;
 		private Color c;
@@ -169,7 +171,7 @@ public class GraphicalCaptureTool extends JFrame implements DataCaptureTool {
 		int lastHeight;
 
 		public SensorData(Color color) {
-			values = Collections.synchronizedMap(new TreeMap<Long, Double>());
+			values = new ConcurrentLinkedQueue<Entry<Long, Double>>();
 			c = color;
 			range = 250;
 			lastHeight = 0;
@@ -189,7 +191,9 @@ public class GraphicalCaptureTool extends JFrame implements DataCaptureTool {
 		}
 
 		public void addValue(long time, double value) {
-			values.put(time, value);
+			values.add(new AbstractMap.SimpleEntry<Long, Double>(time, value));
+			if (values.size() > 300)
+				values.remove();
 			if (value > highest)
 				highest = value;
 		}
@@ -199,16 +203,18 @@ public class GraphicalCaptureTool extends JFrame implements DataCaptureTool {
 			g.setColor(c);
 			double pixls = width / range;
 			int margin = 0;
-			
+
 			double scalar = height / highest;
-			
-			
-			for (int y = 1; y <= 300 && y <= values.size(); y++) {
-				int newHeight = (int) ((Double)values.values().toArray()[values.size() - y] * scalar);
-				//System.out.println(newHeight + " " + margin + " " + highest);
+
+			// TODO Is not time based
+			Iterator<Entry<Long, Double>> it = values.iterator();
+			while (it.hasNext()) {
+				int newHeight = (int) ((Double) it.next().getValue() * scalar);
+				// System.out.println(values.size() + " " + y + " " +
+				// highest);
 				g.drawLine(width - margin, height - lastHeight, width
 						- (int) (margin += pixls), height - newHeight);
-				
+
 				lastHeight = newHeight;
 			}
 
