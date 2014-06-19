@@ -31,12 +31,14 @@ public class GraphicalCaptureTool extends JFrame implements DataCaptureTool {
 	private static final long serialVersionUID = -2893656367422723997L;
 	private TreeMap<String, SensorContainer> sensors;
 	private int height, width;
+	private TreeMap<String, Boolean> binaryTracker;
 
 	/**
 	 * 
 	 */
 	public GraphicalCaptureTool() {
 		sensors = new TreeMap<String, SensorContainer>();
+		binaryTracker = new TreeMap<String, Boolean>();
 
 		this.setSize(700, 700);
 
@@ -45,30 +47,23 @@ public class GraphicalCaptureTool extends JFrame implements DataCaptureTool {
 
 		this.setVisible(true);
 
-		new Thread() {
-			@Override
-			public void run() {
 
-				while (1 == 1) {
-					repaint();
-					try {
-						Thread.sleep(10);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
-			}
-		}.start();
 	}
 
 	@Override
 	public void addData(Sensor s, String dataName, long time, int value) {
-
 		addData(s, dataName, time, (double) value);
 	}
 
 	@Override
 	public void addData(Sensor s, String dataName, long time, boolean value) {
+		Boolean b = binaryTracker.get(s.getName() + "." + dataName);
+		if(b == null)
+			binaryTracker.put(s.getName() + "." + dataName, value);
+		else if(b != value){
+			addData(s, dataName, time, value ? 0.0 : 1.0);
+			binaryTracker.put(s.getName() + "." + dataName, value);
+		}
 		addData(s, dataName, time, value ? 1.0 : 0.0);
 	}
 
@@ -81,6 +76,7 @@ public class GraphicalCaptureTool extends JFrame implements DataCaptureTool {
 	public void addData(Sensor s, String dataName, long time, double value) {
 		SensorContainer list = getSensorContainer(s);
 		list.addValue(dataName, time, value);
+		repaint();
 	}
 
 	private SensorContainer getSensorContainer(Sensor s) {
@@ -109,7 +105,7 @@ public class GraphicalCaptureTool extends JFrame implements DataCaptureTool {
 
 			this.setBorder(BorderFactory.createLineBorder(Color.GREEN));
 			this.setBackground(Color.GRAY);
-			this.setSize(width, height);
+			this.setSize(width, height+3);
 
 			colors = new LinkedList<Color>();
 
@@ -166,15 +162,15 @@ public class GraphicalCaptureTool extends JFrame implements DataCaptureTool {
 		private int height;
 		private int width;
 		private Color c;
-		private int range;
 		private double highest;
-		int lastHeight;
+		private int timeRange;
+		private long lastTime;
+		private long lastUpdate;
 
 		public SensorData(Color color) {
 			values = new ConcurrentLinkedQueue<Entry<Long, Double>>();
 			c = color;
-			range = 250;
-			lastHeight = 0;
+			timeRange = 10000;
 		}
 
 		public void setDimensions(int width, int height) {
@@ -186,13 +182,11 @@ public class GraphicalCaptureTool extends JFrame implements DataCaptureTool {
 			this.c = c;
 		}
 
-		public void setRange(int range) {
-			this.range = range;
-		}
-
 		public void addValue(long time, double value) {
 			values.add(new AbstractMap.SimpleEntry<Long, Double>(time, value));
-			if (values.size() > 300)
+			lastTime = time;
+			lastUpdate = System.currentTimeMillis();
+			while(values.peek().getKey() - time > timeRange)
 				values.remove();
 			if (value > highest)
 				highest = value;
@@ -201,21 +195,40 @@ public class GraphicalCaptureTool extends JFrame implements DataCaptureTool {
 		public void paint(Graphics g) {
 
 			g.setColor(c);
-			double pixls = width / range;
-			int margin = 0;
+			int oldX = -1, lastHeight = -1;
 
 			double scalar = height / highest;
-
-			// TODO Is not time based
+				
+			//System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+			
+			long timeSince = System.currentTimeMillis() - lastUpdate;
+			
 			Iterator<Entry<Long, Double>> it = values.iterator();
 			while (it.hasNext()) {
-				int newHeight = (int) ((Double) it.next().getValue() * scalar);
-				// System.out.println(values.size() + " " + y + " " +
-				// highest);
-				g.drawLine(width - margin, height - lastHeight, width
-						- (int) (margin += pixls), height - newHeight);
+				
+				Entry<Long, Double> next = it.next();
+				int newHeight = (int) ((Double) next.getValue() * scalar);
+				
+				int x = (int) (width * (((double)(timeSince + lastTime - next.getKey())) / timeRange));
+				
+				if(oldX == -1)
+					oldX = x;
+				
+				if(lastHeight == -1)
+					lastHeight = newHeight;
+				
+				g.drawLine(width - oldX, height - lastHeight + 1, width - x, height - newHeight + 1);
+				
+				//System.out.println(lastTime + "\t" + x + "\t" + next.getKey() + "\t" + newHeight + "\t" + lastHeight);
 
+				oldX = x;
 				lastHeight = newHeight;
+			}
+			
+			if(timeSince > 0){
+				
+				g.drawLine(width - oldX, height - lastHeight + 1, width, height - lastHeight + 1);
+				
 			}
 
 		}
