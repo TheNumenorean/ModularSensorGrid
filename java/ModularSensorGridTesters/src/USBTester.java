@@ -31,7 +31,7 @@ public class USBTester {
 				l.setStatusLight(false);
 			}
 
-			Thread.sleep(100);
+			Thread.sleep(10);
 		}
 
 		msg.destroy();

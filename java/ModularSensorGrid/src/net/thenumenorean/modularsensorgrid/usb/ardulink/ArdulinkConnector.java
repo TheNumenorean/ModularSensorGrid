@@ -7,6 +7,7 @@ import net.thenumenorean.modularsensorgrid.connector.Connector;
 import net.thenumenorean.modularsensorgrid.connector.DigitalChangeListener;
 
 import org.zu.ardulink.Link;
+import org.zu.ardulink.RawDataListener;
 import org.zu.ardulink.event.AnalogReadChangeEvent;
 import org.zu.ardulink.event.AnalogReadChangeListener;
 import org.zu.ardulink.event.DigitalReadChangeEvent;

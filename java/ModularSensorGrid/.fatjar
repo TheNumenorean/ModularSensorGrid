@@ -1,0 +1,14 @@
+#Fat Jar Configuration File
+#Thu Jun 19 14:54:21 PDT 2014
+onejar.license.required=true
+manifest.classpath=
+manifest.removesigners=true
+onejar.checkbox=false
+jarname=ModularSensorGrid_fat.jar
+manifest.mergeall=true
+manifest.mainclass=
+manifest.file=<createnew>
+jarname.isextern=false
+onejar.expand=
+excludes=
+includes=

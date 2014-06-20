@@ -1,16 +1,21 @@
 import net.thenumenorean.modularsensorgrid.*
-msg = GridCreator.constructNewModularSensorGrid(10);
+import net.thenumenorean.modularsensorgrid.datacapture.*
+import net.thenumenorean.modularsensorgrid.usb.ardulink.*
+
+msg = ModularSensorGrid();
+ArdulinkGridPopulator.populate(msg);
 
 l = msg.getSensor('LightSensor1');
 
-
+msg.addDataCaptureTool(GraphicalCaptureTool());
+msg.start();
 
 while 1 == 1
-    pause(1);
-    fprintf('fin');
-    if l.getValue() > 500
-        l.setLight(true);
-    else l.setLight(false);
+    pause(.01);
+    if l.getLightIntensity() > 700
+        l.setStatusLight(true);
+    else l.setStatusLight(false);
     end
 end
-pop.stop();
+
+msg.destroy();
